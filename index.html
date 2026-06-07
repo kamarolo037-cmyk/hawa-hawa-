@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🌴 Hawa Hawa Beach Bar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand: #fde68a;
+  --sand2: #f59e0b;
+  --ocean: #0ea5e9;
+  --ocean2: #0284c7;
+  --deep: #0c4a6e;
+  --sky1: #38bdf8;
+  --sky2: #7dd3fc;
+  --sunset: #f97316;
+  --coral: #fb7185;
+  --coco: #f59e0b;
+  --night: #0f172a;
+  --night2: #1e293b;
+  --night3: #334155;
+  --green: #10b981;
+  --purple: #8b5cf6;
+  --gold: #fbbf24;
+  --white: #ffffff;
+  --glass: rgba(255,255,255,0.08);
+  --glass2: rgba(255,255,255,0.14);
+  --border: rgba(255,255,255,0.12);
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --radius: 20px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--night);
+  color:var(--text);
+  position:relative;
+  overflow:hidden;
+}
+
+/* ===== LOADER ===== */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--night);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+}
+.loader-ocean{
+  position:absolute;bottom:0;left:0;right:0;height:35%;
+  background:linear-gradient(180deg,var(--ocean) 0%,var(--deep) 100%);
+  overflow:hidden;
+}
+.loader-wave{
+  position:absolute;top:-12px;left:0;width:200%;height:24px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24'%3E%3Cpath d='M0,12 C50,0 100,24 150,12 C200,0 250,24 300,12 C350,0 400,24 400,12 L400,24 L0,24 Z' fill='rgba(255,255,255,0.18)'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;
+  animation:waveMove 2.5s linear infinite;
+}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.loader-sky{
+  position:absolute;top:0;left:0;right:0;height:65%;
+  background:linear-gradient(180deg,#0f172a 0%,#1e3a5f 60%,#2a5a8a 100%);
+}
+.loader-stars{position:absolute;top:0;left:0;right:0;height:65%;}
+.loader-star{
+  position:absolute;background:white;border-radius:50%;
+  animation:starTwinkle 2s ease-in-out infinite;
+}
+@keyframes starTwinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+.loader-content{
+  position:relative;z-index:10;
+  text-align:center;
+  margin-bottom:60px;
+}
+.loader-logo{
+  font-family:'Pacifico',cursive;
+  font-size:42px;
+  background:linear-gradient(135deg,var(--sand),var(--sunset),var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:logoPulse 2s ease-in-out infinite;
+  text-shadow:none;
+  margin-bottom:6px;
+}
+@keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.loader-sub{font-size:13px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;}
+.loader-palm{font-size:64px;animation:palmSway 2s ease-in-out infinite;}
+@keyframes palmSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.loader-bar{
+  width:180px;height:4px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;overflow:hidden;
+  margin:0 auto;
+}
+.loader-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--coco),var(--sunset),var(--coral));
+  border-radius:2px;
+  transition:width 0.15s ease;
+}
+.loader-tip{font-size:12px;color:var(--text2);margin-top:12px;min-height:18px;}
+
+/* ===== APP SHELL ===== */
+#app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  opacity:0;transition:opacity 0.6s ease;
+  overflow:hidden;
+}
+#app.visible{opacity:1;}
+
+/* ===== DYNAMIC BACKGROUND ===== */
+.bg-sky{
+  position:fixed;inset:0;z-index:0;
+  background:linear-gradient(180deg,#0c4a6e 0%,#075985 30%,#0369a1 55%,#f59e0b 75%,#ea580c 90%,#c2410c 100%);
+  transition:background 3s ease;
+}
+.bg-stars{position:fixed;top:0;left:0;right:0;height:60%;z-index:1;pointer-events:none;}
+.bg-star{position:absolute;background:white;border-radius:50%;animation:twinkle 3s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:0.8}}
+
+/* ===== SCROLL CONTAINER ===== */
+.scroll-wrap{
+  position:relative;z-index:5;
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding-bottom:84px;
+  padding-top:70px;
+  -webkit-overflow-scrolling:touch;
+}
+.scroll-wrap::-webkit-scrollbar{display:none;}
+
+/* ===== TOPBAR ===== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:10px 14px 10px;
+  background:rgba(15,23,42,0.75);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.topbar-avatar{
+  width:38px;height:38px;border-radius:50%;
+  border:2px solid var(--coco);
+  object-fit:cover;flex-shrink:0;
+  background:var(--night2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;overflow:hidden;
+}
+.topbar-avatar img{width:100%;height:100%;object-fit:cover;}
+.topbar-info{flex:1;min-width:0;}
+.topbar-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-bar{font-size:11px;color:var(--text2);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.coins-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(245,158,11,0.15);
+  border:1.5px solid rgba(245,158,11,0.4);
+  border-radius:20px;padding:5px 11px;
+  font-weight:900;font-size:14px;color:var(--coco);
+}
+.level-pill{
+  background:linear-gradient(135deg,var(--sunset),var(--coral));
+  border-radius:20px;padding:5px 11px;
+  font-size:11px;font-weight:900;color:white;
+  white-space:nowrap;
+}
+
+/* ===== SECTIONS ===== */
+.section{display:none;padding:12px;}
+.section.active{display:block;}
+
+/* ===== BEACH SCENE ===== */
+.beach-scene{
+  position:relative;width:100%;height:220px;
+  border-radius:24px;overflow:hidden;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+  border:1px solid var(--border);
+}
+.scene-sky{
+  position:absolute;top:0;left:0;right:0;height:55%;
+  background:linear-gradient(180deg,#075985,#0ea5e9 70%,#38bdf8);
+}
+.scene-sun{
+  position:absolute;top:16px;right:24px;
+  width:48px;height:48px;
+  background:radial-gradient(circle,#fef08a,#f59e0b);
+  border-radius:50%;
+  box-shadow:0 0 40px 16px rgba(251,191,36,0.4);
+  animation:sunPulse 4s ease-in-out infinite;
+}
+@keyframes sunPulse{0%,100%{box-shadow:0 0 40px 16px rgba(251,191,36,0.4)}50%{box-shadow:0 0 60px 24px rgba(251,191,36,0.6)}}
+.scene-ocean{
+  position:absolute;bottom:62px;left:0;right:0;height:58px;
+  background:linear-gradient(180deg,#0ea5e9,#075985);
+  overflow:hidden;
+}
+.scene-wave{position:absolute;width:200%;height:22px;top:-8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 22'%3E%3Cpath d='M0,11 C50,0 100,22 150,11 C200,0 250,22 300,11 C350,0 400,22 400,11 L400,22 L0,22 Z' fill='rgba(255,255,255,0.2)'/%3E%3C/svg%3E");background-repeat:repeat-x;animation:wMove 3s linear infinite;}
+.scene-wave2{animation:wMove2 4.5s linear infinite;top:3px;opacity:0.5;}
+@keyframes wMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes wMove2{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.scene-sand{
+  position:absolute;bottom:0;left:0;right:0;height:70px;
+  background:linear-gradient(180deg,#fde68a,#f59e0b);
+}
+.scene-items{position:absolute;bottom:62px;left:0;right:0;height:80px;}
+.scene-item{
+  position:absolute;bottom:0;font-size:32px;
+  filter:drop-shadow(2px 5px 8px rgba(0,0,0,0.3));
+  animation:itemFloat 3s ease-in-out infinite;
+  cursor:pointer;user-select:none;
+  transition:transform 0.12s;
+}
+.scene-item:active{transform:scale(0.8) !important;}
+@keyframes itemFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.scene-tap-hint{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,0.5);color:white;
+  font-size:11px;font-weight:700;
+  padding:4px 14px;border-radius:20px;
+  pointer-events:none;white-space:nowrap;
+}
+.scene-income{
+  position:absolute;top:10px;left:12px;
+  background:rgba(0,0,0,0.4);
+  border-radius:12px;padding:4px 10px;
+  font-size:11px;font-weight:800;color:var(--coco);
+}
+
+/* float coin */
+.fcoin{
+  position:fixed;font-size:18px;font-weight:900;
+  color:var(--coco);pointer-events:none;z-index:9998;
+  animation:fcoinAnim 1.3s ease-out forwards;
+  text-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+@keyframes fcoinAnim{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-90px) scale(1.4)}}
+
+/* ===== XP BAR ===== */
+.xp-block{
+  background:var(--glass2);
+  border:1px solid var(--border);
+  border-radius:16px;padding:12px 14px;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.xp-label{font-size:12px;color:var(--text2);font-weight:700;white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;}
+.xp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--coco),var(--sunset),var(--coral));transition:width 0.7s ease;}
+.xp-val{font-size:11px;color:var(--text2);white-space:nowrap;}
+
+/* ===== BAR NAME ===== */
+.bar-name-wrap{
+  background:var(--glass);
+  border:1.5px solid rgba(245,158,11,0.3);
+  border-radius:16px;padding:2px 4px;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.bar-name-icon{font-size:22px;padding:0 6px;}
+.bar-name-input{
+  flex:1;background:none;border:none;outline:none;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;
+  color:var(--sand);padding:9px 4px;
+}
+.bar-name-input::placeholder{color:var(--text2);}
+
+/* ===== QUICK ORDERS ===== */
+.quick-title{font-size:13px;font-weight:800;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.quick-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+.quick-row::-webkit-scrollbar{display:none;}
+.quick-btn{
+  flex-shrink:0;
+  background:var(--glass2);
+  border:1.5px solid var(--border);
+  border-radius:16px;padding:10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;transition:all 0.18s;
+  min-width:72px;
+  position:relative;
+}
+.quick-btn:active{transform:scale(0.9);}
+.quick-btn.cooling{opacity:0.5;}
+.quick-btn span:first-child{font-size:28px;}
+.quick-btn .q-name{font-size:11px;font-weight:700;color:var(--text2);}
+.quick-btn .q-coin{font-size:11px;font-weight:900;color:var(--coco);}
+.quick-cooldown{
+  position:absolute;inset:0;border-radius:14px;
+  background:rgba(0,0,0,0.55);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:white;
+}
+
+/* ===== DAILY BONUS ===== */
+.daily-card{
+  background:linear-gradient(135deg,rgba(139,92,246,0.25),rgba(236,72,153,0.2));
+  border:1.5px solid rgba(139,92,246,0.4);
+  border-radius:20px;padding:14px 16px;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:transform 0.15s;
+}
+.daily-card:active{transform:scale(0.97);}
+.daily-card.claimed{opacity:0.5;cursor:default;}
+.daily-info{flex:1;}
+.daily-title{font-size:15px;font-weight:900;margin-bottom:2px;}
+.daily-sub{font-size:12px;color:var(--text2);}
+.daily-reward{font-size:24px;font-weight:900;color:var(--gold);}
+
+/* ===== SECTION TITLE ===== */
+.sec-title{
+  font-family:'Bebas Neue',cursive;
+  font-size:26px;letter-spacing:1.5px;
+  color:var(--sand);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* ===== TASKS ===== */
+.tasks-filter{
+  display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;
+}
+.tasks-filter::-webkit-scrollbar{display:none;}
+.filter-btn{
+  flex-shrink:0;
+  padding:6px 14px;border-radius:20px;border:none;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;
+  cursor:pointer;
+  background:var(--glass2);color:var(--text2);
+  border:1.5px solid var(--border);
+  transition:all 0.18s;
+}
+.filter-btn.active{background:var(--coco);color:var(--night);border-color:var(--coco);}
+.task-card{
+  background:var(--glass);
+  border:1.5px solid var(--border);
+  border-radius:18px;padding:12px 14px;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;
+  transition:all 0.18s;
+  position:relative;overflow:hidden;
+}
+.task-card::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+  background:var(--coco);border-radius:3px 0 0 3px;
+  opacity:0;transition:opacity 0.2s;
+}
+.task-card.ready::before{opacity:1;}
+.task-card.done{opacity:0.45;border-color:rgba(16,185,129,0.3);}
+.task-card.done::before{background:var(--green);opacity:1;}
+.task-card:active{transform:scale(0.97);}
+.task-ico{font-size:28px;flex-shrink:0;}
+.task-body{flex:1;min-width:0;}
+.task-name{font-size:13px;font-weight:800;margin-bottom:1px;}
+.task-desc{font-size:11px;color:var(--text2);margin-bottom:5px;}
+.task-prog-wrap{background:rgba(255,255,255,0.07);border-radius:4px;height:5px;overflow:hidden;}
+.task-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--coco),var(--sunset));transition:width 0.5s ease;}
+.task-prog-label{font-size:10px;color:var(--text2);margin-top:3px;}
+.task-reward{font-size:14px;font-weight:900;color:var(--coco);white-space:nowrap;flex-shrink:0;}
+.task-check{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;}
+
+/* ===== SHOP ===== */
+.shop-cats{
+  display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;
+}
+.shop-cats::-webkit-scrollbar{display:none;}
+.cat-btn{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  background:var(--glass2);color:var(--text2);
+  border:1.5px solid var(--border);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;
+  cursor:pointer;transition:all 0.18s;
+}
+.cat-btn.active{background:var(--ocean);color:white;border-color:var(--ocean);}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.shop-card{
+  background:var(--glass);
+  border:1.5px solid var(--border);
+  border-radius:20px;padding:14px 10px;
+  text-align:center;cursor:pointer;
+  transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.shop-card:active{transform:scale(0.93);}
+.shop-card.owned{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.06);}
+.shop-card.affordable{border-color:rgba(245,158,11,0.5);}
+.shop-card.rare-item{border-color:rgba(139,92,246,0.5);}
+.shop-emoji{font-size:42px;margin-bottom:6px;display:block;}
+.shop-name{font-size:12px;font-weight:800;margin-bottom:6px;color:var(--text);}
+.shop-price-tag{
+  display:inline-flex;align-items:center;gap:3px;
+  background:rgba(245,158,11,0.12);
+  border:1px solid rgba(245,158,11,0.3);
+  border-radius:10px;padding:3px 9px;
+  font-size:12px;font-weight:900;color:var(--coco);
+}
+.shop-owned-mark{
+  position:absolute;top:8px;right:8px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+}
+.rare-tag{
+  position:absolute;top:8px;left:8px;
+  background:linear-gradient(135deg,var(--purple),#ec4899);
+  color:white;font-size:9px;font-weight:900;
+  padding:2px 7px;border-radius:8px;letter-spacing:0.5px;
+}
+.shop-level-lock{
+  position:absolute;inset:0;border-radius:18px;
+  background:rgba(15,23,42,0.75);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+}
+.shop-level-lock span:first-child{font-size:24px;}
+.shop-level-lock span:last-child{font-size:11px;font-weight:800;color:var(--text2);}
+
+/* ===== PROFILE ===== */
+.profile-hero{
+  background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(245,158,11,0.15));
+  border:1px solid var(--border);
+  border-radius:24px;padding:20px 16px;
+  text-align:center;margin-bottom:12px;
+  position:relative;overflow:hidden;
+}
+.profile-hero::before{
+  content:'🌊';position:absolute;right:-10px;bottom:-10px;
+  font-size:80px;opacity:0.06;pointer-events:none;
+}
+.profile-avatar-wrap{
+  width:72px;height:72px;border-radius:50%;
+  border:3px solid var(--coco);
+  margin:0 auto 10px;overflow:hidden;
+  background:var(--night2);font-size:32px;
+  display:flex;align-items:center;justify-content:center;
+}
+.profile-avatar-wrap img{width:100%;height:100%;object-fit:cover;}
+.profile-username{font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:1px;color:var(--sand);}
+.profile-handle{font-size:12px;color:var(--text2);margin-bottom:12px;}
+.profile-stats{display:flex;gap:8px;justify-content:center;}
+.pstat{
+  background:var(--glass2);border:1px solid var(--border);
+  border-radius:14px;padding:10px 14px;flex:1;text-align:center;
+}
+.pstat-val{font-size:18px;font-weight:900;color:var(--coco);display:block;}
+.pstat-label{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+
+.achievements-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.ach-item{
+  background:var(--glass);border:1.5px solid var(--border);
+  border-radius:14px;padding:10px 4px;
+  text-align:center;cursor:default;
+  transition:transform 0.15s;
+}
+.ach-item.unlocked{border-color:rgba(251,191,36,0.5);}
+.ach-item:active{transform:scale(0.9);}
+.ach-ico{font-size:28px;display:block;margin-bottom:3px;}
+.ach-name{font-size:9px;color:var(--text2);font-weight:700;}
+.ach-item.locked .ach-ico{filter:grayscale(1);opacity:0.3;}
+
+/* ===== LEADERBOARD ===== */
+.tournament-banner{
+  background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(249,115,22,0.15));
+  border:1.5px solid rgba(251,191,36,0.35);
+  border-radius:20px;padding:14px 16px;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+}
+.tournament-banner .tb-icon{font-size:40px;}
+.tournament-banner .tb-info{flex:1;}
+.tournament-banner .tb-title{font-size:15px;font-weight:900;color:var(--gold);}
+.tournament-banner .tb-sub{font-size:12px;color:var(--text2);}
+.tournament-banner .tb-time{font-size:18px;font-weight:900;color:var(--sunset);}
+
+.lb-card{
+  background:var(--glass);border:1.5px solid var(--border);
+  border-radius:16px;padding:10px 14px;
+  margin-bottom:6px;
+  display:flex;align-items:center;gap:10px;
+  transition:transform 0.15s;
+}
+.lb-card.me{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.4);}
+.lb-rank{font-size:18px;font-weight:900;width:28px;text-align:center;flex-shrink:0;}
+.lb-rank.r1{color:var(--gold);}
+.lb-rank.r2{color:#94a3b8;}
+.lb-rank.r3{color:#cd7f32;}
+.lb-avatar{font-size:26px;flex-shrink:0;}
+.lb-info{flex:1;min-width:0;}
+.lb-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-bar{font-size:11px;color:var(--text2);}
+.lb-score{font-size:14px;font-weight:900;color:var(--coco);}
+
+/* ===== EVENTS (NEW!) ===== */
+.event-card{
+  background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(139,92,246,0.12));
+  border:1.5px solid rgba(236,72,153,0.3);
+  border-radius:20px;padding:16px;
+  margin-bottom:10px;
+  cursor:pointer;transition:transform 0.15s;
+}
+.event-card:active{transform:scale(0.97);}
+.event-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.event-icon{font-size:36px;}
+.event-title{font-size:15px;font-weight:900;}
+.event-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;}
+.event-progress{background:rgba(255,255,255,0.08);border-radius:6px;height:7px;overflow:hidden;margin-bottom:6px;}
+.event-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#ec4899,#8b5cf6);}
+.event-footer{display:flex;justify-content:space-between;align-items:center;}
+.event-reward{font-size:13px;font-weight:900;color:var(--gold);}
+.event-timer{font-size:11px;color:var(--text2);}
+
+/* ===== CAFE ===== */
+.menu-card{
+  background:var(--glass);border:1.5px solid var(--border);
+  border-radius:16px;padding:12px 14px;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+}
+.menu-ico{font-size:32px;flex-shrink:0;}
+.menu-info{flex:1;}
+.menu-name{font-size:14px;font-weight:800;}
+.menu-desc{font-size:11px;color:var(--text2);}
+.menu-btn{
+  padding:8px 14px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--coco),var(--sunset));
+  color:white;font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:900;cursor:pointer;
+  transition:transform 0.15s;flex-shrink:0;
+}
+.menu-btn:active{transform:scale(0.9);}
+
+/* ===== TABS ===== */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(15,23,42,0.9);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.tab-btn{
+  flex:1;padding:10px 4px 8px;
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:rgba(255,255,255,0.3);
+  transition:color 0.2s,transform 0.15s;
+  font-family:'Nunito',sans-serif;
+}
+.tab-btn.active{color:var(--coco);}
+.tab-btn.active .tab-icon{transform:translateY(-3px) scale(1.15);}
+.tab-icon{font-size:22px;transition:transform 0.2s;}
+.tab-label{font-size:10px;font-weight:700;}
+.tab-dot{
+  position:absolute;top:8px;right:10px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--coral);
+  border:1.5px solid var(--night);
+}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;top:74px;left:50%;transform:translateX(-50%);
+  background:rgba(15,23,42,0.92);
+  color:white;padding:9px 18px;border-radius:20px;
+  font-size:13px;font-weight:700;
+  z-index:999;pointer-events:none;
+  animation:toastAnim 2.8s ease-out forwards;
+  white-space:nowrap;
+  border:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+@keyframes toastAnim{0%{opacity:0;transform:translateX(-50%) translateY(-8px)}12%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-8px)}}
+
+/* ===== MODAL ===== */
+.modal-bg{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:mBgIn 0.2s ease;
+}
+@keyframes mBgIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{
+  background:var(--night2);
+  border-radius:28px 28px 0 0;
+  padding:20px 20px 36px;
+  width:100%;max-width:480px;
+  border-top:1px solid var(--border);
+  animation:mSlide 0.26s ease-out;
+}
+@keyframes mSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--night3);border-radius:2px;margin:0 auto 18px;}
+.modal-big{font-size:56px;text-align:center;margin-bottom:8px;}
+.modal-title{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;text-align:center;color:var(--sand);margin-bottom:6px;}
+.modal-body{font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:18px;}
+.modal-btn{
+  display:block;width:100%;
+  padding:14px;border-radius:16px;border:none;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  cursor:pointer;transition:transform 0.15s;
+  background:linear-gradient(135deg,var(--coco),var(--sunset));
+  color:white;
+  box-shadow:0 6px 20px rgba(249,115,22,0.35);
+}
+.modal-btn:active{transform:scale(0.96);}
+
+/* ===== WEATHER WIDGET ===== */
+.weather-chip{
+  background:var(--glass2);border:1px solid var(--border);
+  border-radius:14px;padding:8px 14px;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;color:var(--text2);
+  margin-bottom:12px;
+}
+
+/* ===== STREAK ===== */
+.streak-row{
+  display:flex;gap:6px;margin-bottom:12px;
+}
+.streak-day{
+  flex:1;height:40px;border-radius:10px;
+  background:var(--glass);border:1.5px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;
+}
+.streak-day.done{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);}
+.streak-day span:first-child{font-size:16px;}
+.streak-day span:last-child{font-size:8px;color:var(--text2);font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- ============ LOADER ============ -->
+<div id="loader">
+  <div class="loader-sky"></div>
+  <div class="loader-stars" id="loaderStars"></div>
+  <div class="loader-ocean">
+    <div class="loader-wave"></div>
+  </div>
+  <div class="loader-content">
+    <div class="loader-palm">🌴</div>
+    <div class="loader-logo">Hawa Hawa</div>
+    <div class="loader-sub">Beach Bar · Sochi</div>
+    <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+    <div class="loader-tip" id="loaderTip">Прогреваем песок... ☀️</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <div class="bg-sky" id="bgSky"></div>
+  <div class="bg-stars" id="bgStars"></div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-avatar" id="topAvatar"><span>🌴</span></div>
+    <div class="topbar-info">
+      <div class="topbar-name" id="topName">Загрузка...</div>
+      <div class="topbar-bar" id="topBarName">🏖️ Мой бар</div>
+    </div>
+    <div class="topbar-right">
+      <div class="coins-pill"><span>🥥</span><span id="coinsVal">0</span></div>
+      <div class="level-pill" id="levelPill">Ур.1</div>
+    </div>
+  </div>
+
+  <div class="scroll-wrap">
+
+    <!-- ======= BAR TAB ======= -->
+    <div id="secBar" class="section active" style="padding-top:0">
+
+      <div class="weather-chip" id="weatherChip">🌤 Сочи · 28°C · Пляжный сезон!</div>
+
+      <!-- daily bonus -->
+      <div class="daily-card" id="dailyCard" onclick="claimDaily()">
+        <div style="font-size:36px">🎁</div>
+        <div class="daily-info">
+          <div class="daily-title">Ежедневный бонус</div>
+          <div class="daily-sub">Заходи каждый день — награда растёт!</div>
+        </div>
+        <div class="daily-reward" id="dailyReward">+25🥥</div>
+      </div>
+
+      <!-- streak -->
+      <div class="quick-title">🔥 Серия дней</div>
+      <div class="streak-row" id="streakRow"></div>
+
+      <!-- bar name -->
+      <div class="bar-name-wrap">
+        <div class="bar-name-icon">🏖️</div>
+        <input class="bar-name-input" id="barInput" placeholder="Назови свой бар..." maxlength="24" oninput="updateBarName(this.value)">
+      </div>
+
+      <!-- xp -->
+      <div class="xp-block">
+        <div class="xp-label" id="xpLabel">Ур.1</div>
+        <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        <div class="xp-val" id="xpVal">0/100 XP</div>
+      </div>
+
+      <!-- beach scene -->
+      <div class="beach-scene" id="beachScene" onclick="tapScene(event)">
+        <div class="scene-sky"></div>
+        <div class="scene-sun"></div>
+        <div class="scene-ocean">
+          <div class="scene-wave"></div>
+          <div class="scene-wave scene-wave2"></div>
+        </div>
+        <div class="scene-sand"></div>
+        <div class="scene-items" id="sceneItems"></div>
+        <div class="scene-income" id="sceneIncome">💰 +1/тап</div>
+        <div class="scene-tap-hint">👆 Тапай — зарабатывай кокосы!</div>
+      </div>
+
+      <!-- quick orders -->
+      <div class="quick-title">⚡ Быстрые заказы</div>
+      <div class="quick-row" id="quickRow"></div>
+
+    </div>
+
+    <!-- ======= TASKS TAB ======= -->
+    <div id="secTasks" class="section">
+      <div class="sec-title">🎯 Задания</div>
+      <div class="tasks-filter" id="tasksFilter"></div>
+      <div id="tasksList"></div>
+    </div>
+
+    <!-- ======= SHOP TAB ======= -->
+    <div id="secShop" class="section">
+      <div class="sec-title">🛍️ Магазин</div>
+      <div class="shop-cats" id="shopCats"></div>
+      <div class="shop-grid" id="shopGrid"></div>
+    </div>
+
+    <!-- ======= LEADERBOARD TAB ======= -->
+    <div id="secLeader" class="section">
+      <div class="sec-title">🏆 Турнир</div>
+      <div class="tournament-banner">
+        <div class="tb-icon">🏅</div>
+        <div class="tb-info">
+          <div class="tb-title">Турнир недели</div>
+          <div class="tb-sub">Hawa Hawa · Приморская 2/4</div>
+        </div>
+        <div class="tb-time" id="tbTimer">06д 14ч</div>
+      </div>
+      <div id="lbList"></div>
+    </div>
+
+    <!-- ======= PROFILE TAB ======= -->
+    <div id="secProfile" class="section">
+      <div class="sec-title">👤 Профиль</div>
+      <div class="profile-hero">
+        <div class="profile-avatar-wrap" id="profAvatarWrap"><span>🌴</span></div>
+        <div class="profile-username" id="profName">–</div>
+        <div class="profile-handle" id="profHandle">@username</div>
+        <div class="profile-stats" id="profStats"></div>
+      </div>
+      <div class="quick-title" style="margin-top:4px">🏅 Достижения</div>
+      <div class="achievements-grid" id="achGrid"></div>
+      <div class="quick-title">📅 События</div>
+      <div id="eventsList"></div>
+    </div>
+
+  </div><!-- end scroll-wrap -->
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('Bar',this)" style="position:relative">
+      <span class="tab-icon">🏖️</span><span class="tab-label">Бар</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('Tasks',this)" style="position:relative" id="tabTasks">
+      <span class="tab-icon">🎯</span><span class="tab-label">Задания</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('Shop',this)">
+      <span class="tab-icon">🛍️</span><span class="tab-label">Магазин</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('Leader',this)">
+      <span class="tab-icon">🏆</span><span class="tab-label">Топ</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('Profile',this)">
+      <span class="tab-icon">👤</span><span class="tab-label">Профиль</span>
+    </button>
+  </div>
+
+</div><!-- end app -->
+
+<!-- MODAL -->
+<div id="modalBg" style="display:none" onclick="closeMod(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-big" id="modEmoji"></div>
+    <div class="modal-title" id="modTitle"></div>
+    <div class="modal-body" id="modBody"></div>
+    <button class="modal-btn" id="modBtn" onclick="closeModAll()">🎉 Круто!</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TELEGRAM INIT
+// ============================================================
+const TG = window.Telegram?.WebApp;
+let tgUser = null;
+if (TG) {
+  TG.ready(); TG.expand();
+  tgUser = TG.initDataUnsafe?.user || null;
+}
+
+// ============================================================
+// DEFAULT STATE
+// ============================================================
+const DEF = {
+  coins:80, xp:0, level:1, barName:'',
+  ownedItems:[], taskProgress:{}, taskClaimed:{},
+  totalTaps:0, totalOrders:0, totalBuys:0,
+  lastDaily:null, streak:0, streakDays:[],
+  lastOrderCools:{}, achievements:[],
+  eventProgress:{}, lastQRDate:null,
+};
+let S = JSON.parse(localStorage.getItem('hawa2') || 'null') || {...DEF};
+const save = () => localStorage.setItem('hawa2', JSON.stringify(S));
+
+// ============================================================
+// DATA
+// ============================================================
+const ITEMS = [
+  // furniture
+  {id:'chair', name:'Шезлонг', emoji:'🪑', price:25, cat:'Мебель'},
+  {id:'table', name:'Столик', emoji:'🛋️', price:35, cat:'Мебель'},
+  {id:'bar_counter', name:'Барная стойка', emoji:'🍸', price:75, cat:'Мебель'},
+  {id:'hammock', name:'Гамак', emoji:'🛖', price:60, cat:'Мебель'},
+  {id:'umbrella', name:'Зонтик', emoji:'⛱️', price:30, cat:'Мебель'},
+  {id:'sunbed', name:'Лежак', emoji:'🛏️', price:45, cat:'Мебель'},
+  // nature
+  {id:'palm', name:'Пальма', emoji:'🌴', price:50, cat:'Природа'},
+  {id:'palm2', name:'Кокосовая', emoji:'🥥', price:65, cat:'Природа'},
+  {id:'flowers', name:'Цветы', emoji:'🌺', price:30, cat:'Природа'},
+  {id:'cactus', name:'Кактус', emoji:'🌵', price:40, cat:'Природа'},
+  {id:'coral', name:'Коралл', emoji:'🪸', price:55, cat:'Природа'},
+  {id:'seashell', name:'Ракушки', emoji:'🐚', price:20, cat:'Природа'},
+  // decor
+  {id:'music', name:'Колонки', emoji:'🎵', price:55, cat:'Декор'},
+  {id:'lights', name:'Огни', emoji:'🪔', price:45, cat:'Декор'},
+  {id:'bonfire', name:'Костёр', emoji:'🔥', price:40, cat:'Декор'},
+  {id:'lantern', name:'Фонарик', emoji:'🏮', price:35, cat:'Декор'},
+  {id:'flag', name:'Флаг', emoji:'🏁', price:25, cat:'Декор'},
+  {id:'telescope', name:'Телескоп', emoji:'🔭', price:80, cat:'Декор'},
+  // sport
+  {id:'surf', name:'Сёрфборд', emoji:'🏄', price:70, cat:'Спорт'},
+  {id:'volleyball', name:'Волейбол', emoji:'🏐', price:55, cat:'Спорт'},
+  {id:'snorkel', name:'Маска', emoji:'🤿', price:45, cat:'Спорт'},
+  {id:'kayak', name:'Каяк', emoji:'🚣', price:90, cat:'Спорт'},
+  // animals
+  {id:'flamingo', name:'Фламинго', emoji:'🦩', price:85, cat:'Животные'},
+  {id:'parrot', name:'Попугай', emoji:'🦜', price:110, cat:'Животные'},
+  {id:'crab', name:'Краб', emoji:'🦀', price:40, cat:'Животные'},
+  {id:'turtle', name:'Черепаха', emoji:'🐢', price:75, cat:'Животные'},
+  // rare
+  {id:'boat', name:'Лодка', emoji:'⛵', price:180, cat:'Редкие', rare:true},
+  {id:'dolphin', name:'Дельфин', emoji:'🐬', price:240, cat:'Редкие', rare:true, minLevel:4},
+  {id:'treasure', name:'Сундук', emoji:'🧳', price:150, cat:'Редкие', rare:true},
+  {id:'lighthouse', name:'Маяк', emoji:'🗼', price:320, cat:'Редкие', rare:true, minLevel:5},
+  {id:'whale', name:'Кит', emoji:'🐋', price:500, cat:'Редкие', rare:true, minLevel:7},
+];
+
+const SHOP_CATS = ['Все','Мебель','Природа','Декор','Спорт','Животные','Редкие'];
+
+const TASKS = [
+  // тапы
+  {id:'tap1', name:'Первый клиент', desc:'Тапни по пляжу 1 раз', icon:'👋', reward:15, type:'tap', target:1, cat:'Начало'},
+  {id:'tap10', name:'Тусовка', desc:'10 тапов', icon:'🤙', reward:25, type:'tap', target:10, cat:'Начало'},
+  {id:'tap50', name:'Популярный бар', desc:'50 тапов', icon:'🎉', reward:50, type:'tap', target:50, cat:'Бар'},
+  {id:'tap200', name:'Легендарный бар', desc:'200 тапов', icon:'💥', reward:120, type:'tap', target:200, cat:'Бар'},
+  {id:'tap500', name:'Король пляжа', desc:'500 тапов', icon:'👑', reward:280, type:'tap', target:500, cat:'Бар'},
+  // покупки
+  {id:'buy1', name:'Первая покупка', desc:'Купи любой предмет', icon:'🛒', reward:20, type:'buy', target:1, cat:'Начало'},
+  {id:'buy5', name:'Обустройство', desc:'Купи 5 предметов', icon:'🛋️', reward:60, type:'buy', target:5, cat:'Магазин'},
+  {id:'buy10', name:'Дизайнер', desc:'Купи 10 предметов', icon:'✨', reward:130, type:'buy', target:10, cat:'Магазин'},
+  {id:'buy20', name:'Топ бар', desc:'Купи 20 предметов', icon:'🏆', reward:300, type:'buy', target:20, cat:'Магазин'},
+  // заказы
+  {id:'order1', name:'Первый заказ', desc:'Сделай 1 заказ', icon:'☕', reward:20, type:'order', target:1, cat:'Начало'},
+  {id:'order5', name:'Постоянный гость', desc:'5 заказов', icon:'🍹', reward:55, type:'order', target:5, cat:'Кафе'},
+  {id:'order15', name:'Гурман', desc:'15 заказов', icon:'🍽️', reward:120, type:'order', target:15, cat:'Кафе'},
+  {id:'order30', name:'Завсегдатай', desc:'30 заказов', icon:'⭐', reward:250, type:'order', target:30, cat:'Кафе'},
+  // уровни
+  {id:'level2', name:'Растём', desc:'Достигни 2 уровня', icon:'📈', reward:50, type:'level', target:2, cat:'Прогресс'},
+  {id:'level5', name:'Ветеран', desc:'Достигни 5 уровня', icon:'🎖️', reward:150, type:'level', target:5, cat:'Прогресс'},
+  {id:'level10', name:'Мастер', desc:'Достигни 10 уровня', icon:'💎', reward:400, type:'level', target:10, cat:'Прогресс'},
+  // серия
+  {id:'streak3', name:'3 дня подряд', desc:'3 дня в приложении', icon:'🔥', reward:60, type:'streak', target:3, cat:'Активность'},
+  {id:'streak7', name:'Неделя', desc:'7 дней подряд', icon:'📅', reward:150, type:'streak', target:7, cat:'Активность'},
+  // редкие
+  {id:'rare1', name:'Коллекционер', desc:'Купи 1 редкий предмет', icon:'💜', reward:100, type:'rare', target:1, cat:'Редкое'},
+  {id:'rare3', name:'Эксклюзив', desc:'Купи 3 редких', icon:'🌟', reward:250, type:'rare', target:3, cat:'Редкое'},
+  // имя
+  {id:'name_bar', name:'Мой бренд', desc:'Назови бар', icon:'🏷️', reward:15, type:'name', target:1, cat:'Начало'},
+  // кокосы
+  {id:'coins100', name:'Первая сотня', desc:'Накопи 100 кокосов', icon:'🥥', reward:20, type:'coins', target:100, cat:'Прогресс'},
+  {id:'coins500', name:'Богач', desc:'Накопи 500 кокосов', icon:'💰', reward:60, type:'coins', target:500, cat:'Прогресс'},
+];
+
+const TASK_CATS = ['Все','Начало','Бар','Магазин','Кафе','Прогресс','Активность','Редкое'];
+
+const ACHIEVEMENTS = [
+  {id:'first_tap', name:'Первый тап', emoji:'👆', cond: s => s.totalTaps >= 1},
+  {id:'buyer', name:'Покупатель', emoji:'🛒', cond: s => s.totalBuys >= 1},
+  {id:'streak3', name:'3 дня', emoji:'🔥', cond: s => s.streak >= 3},
+  {id:'level5', name:'Ур. 5', emoji:'⭐', cond: s => s.level >= 5},
+  {id:'rich', name:'Богач', emoji:'💰', cond: s => s.coins >= 500},
+  {id:'collector', name:'Коллектор', emoji:'🏺', cond: s => s.ownedItems.length >= 10},
+  {id:'social', name:'Звезда', emoji:'🌟', cond: s => s.totalOrders >= 10},
+  {id:'rare_buyer', name:'Редкость', emoji:'💜', cond: s => ITEMS.filter(i=>i.rare&&s.ownedItems.includes(i.id)).length>=1},
+];
+
+const EVENTS = [
+  {id:'sunset_party', name:'Закатная вечеринка', icon:'🌅', desc:'Тапни 30 раз до захода солнца и получи эксклюзивный декор!', target:30, type:'tap', reward:80, rewardEmoji:'🌅'},
+  {id:'cocktail_hour', name:'Коктейльный час', icon:'🍹', desc:'Сделай 5 заказов сегодня — двойные кокосы весь вечер!', target:5, type:'order', reward:60, rewardEmoji:'🍹'},
+  {id:'beach_clean', name:'Чистый пляж', icon:'♻️', desc:'Купи 3 предмета природы и получи бонус!', target:3, type:'buy_nature', reward:90, rewardEmoji:'🌿'},
+];
+
+const QUICK_ORDERS = [
+  {id:'lemon', name:'Лимонад', emoji:'🍋', coins:4, cool:12000},
+  {id:'coctail', name:'Коктейль', emoji:'🍹', coins:7, cool:18000},
+  {id:'coffee', name:'Кофе', emoji:'☕', coins:5, cool:14000},
+  {id:'smoothie', name:'Смузи', emoji:'🥤', coins:6, cool:16000},
+  {id:'pizza', name:'Пицца', emoji:'🍕', coins:10, cool:25000},
+];
+
+const CAFE_MENU = [
+  {id:'cm1', name:'Фреш', emoji:'🍊', desc:'Апельсиновый фреш', bonus:12},
+  {id:'cm2', name:'Мохито', emoji:'🍃', desc:'Освежающий мохито', bonus:18},
+  {id:'cm3', name:'Бургер', emoji:'🍔', desc:'Авторский бургер', bonus:22},
+  {id:'cm4', name:'Сашими', emoji:'🍣', desc:'Свежие морепродукты', bonus:28},
+  {id:'cm5', name:'Тирамису', emoji:'🍰', desc:'Десерт от шефа', bonus:15},
+];
+
+const LEADERBOARD_MOCK = [
+  {name:'Пляжный рай', avatar:'🌊', coins:2840, uid:'mock1'},
+  {name:'Закат Сочи', avatar:'🌅', coins:2210, uid:'mock2'},
+  {name:'Морской бриз', avatar:'💨', coins:1980, uid:'mock3'},
+  {name:'Санта Барбара', avatar:'🏖️', coins:1650, uid:'mock4'},
+  {name:'Солнечный', avatar:'☀️', coins:1340, uid:'mock5'},
+  {name:'Hawa Paradise', avatar:'🌴', coins:980, uid:'mock6'},
+  {name:'Волна', avatar:'🏄', coins:760, uid:'mock7'},
+];
+
+// ============================================================
+// LOADER
+// ============================================================
+const TIPS = [
+  'Прогреваем песок... ☀️',
+  'Готовим коктейли... 🍹',
+  'Расставляем шезлонги... 🪑',
+  'Зовём попугая... 🦜',
+  'Включаем музыку... 🎵',
+  'Добро пожаловать! 🌴',
+];
+let loaderPct = 0;
+const fillEl = document.getElementById('loaderFill');
+const tipEl = document.getElementById('loaderTip');
+
+// Generate loader stars
+const ls = document.getElementById('loaderStars');
+for(let i=0;i<40;i++){
+  const s=document.createElement('div');s.className='loader-star';
+  const sz=Math.random()*2+1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s`;
+  ls.appendChild(s);
+}
+
+function runLoader(){
+  const steps=[
+    {pct:20,tip:TIPS[0],delay:300},
+    {pct:45,tip:TIPS[1],delay:600},
+    {pct:65,tip:TIPS[2],delay:500},
+    {pct:80,tip:TIPS[3],delay:400},
+    {pct:92,tip:TIPS[4],delay:350},
+    {pct:100,tip:TIPS[5],delay:300},
+  ];
+  let i=0;
+  function next(){
+    if(i>=steps.length){setTimeout(launchApp,300);return;}
+    const st=steps[i++];
+    fillEl.style.width=st.pct+'%';
+    tipEl.textContent=st.tip;
+    setTimeout(next,st.delay);
+  }
+  setTimeout(next,200);
+}
+
+function launchApp(){
+  const loader=document.getElementById('loader');
+  loader.style.transition='opacity 0.5s ease';
+  loader.style.opacity='0';
+  setTimeout(()=>{loader.style.display='none';},500);
+  const app=document.getElementById('app');
+  app.classList.add('visible');
+  initGame();
+}
+
+// ============================================================
+// TELEGRAM USER
+// ============================================================
+function getUserInfo(){
+  if(tgUser){
+    return {
+      id: tgUser.id,
+      name: tgUser.first_name + (tgUser.last_name?' '+tgUser.last_name:''),
+      username: tgUser.username||'',
+      photo: tgUser.photo_url||null,
+    };
+  }
+  return {id:null, name:'Пляжник', username:'guest', photo:null};
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function initGame(){
+  const user=getUserInfo();
+  // populate topbar
+  const av=document.getElementById('topAvatar');
+  if(user.photo){av.innerHTML=`<img src="${user.photo}">`;}
+  else{av.innerHTML='<span>🌴</span>';}
+  document.getElementById('topName').textContent = user.name;
+
+  const profAv=document.getElementById('profAvatarWrap');
+  if(user.photo){profAv.innerHTML=`<img src="${user.photo}">`;}
+  document.getElementById('profName').textContent = user.name.toUpperCase();
+  document.getElementById('profHandle').textContent = user.username ? '@'+user.username : 'Hawa Hawa Guest';
+
+  if(!S.barName && user.name) {
+    S.barName = user.name+"'s Bar";
+    save();
+  }
+  document.getElementById('barInput').value = S.barName || '';
+  document.getElementById('topBarName').textContent = '🏖️ '+(S.barName||'Мой бар');
+
+  generateBgStars();
+  checkStreak();
+  renderAll();
+  startPassive();
+  updateTournamentTimer();
+  setInterval(updateTournamentTimer, 60000);
+  checkNewTaskBadge();
+}
+
+function generateBgStars(){
+  const c=document.getElementById('bgStars');
+  for(let i=0;i<25;i++){
+    const s=document.createElement('div');s.className='bg-star';
+    const sz=Math.random()*2.5+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+}
+
+// ============================================================
+// STREAK
+// ============================================================
+function checkStreak(){
+  const today=new Date().toDateString();
+  if(!S.streakDays) S.streakDays=[];
+  // shown last 7 days
+  const days=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const now=new Date();
+  S._streakShow=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(now); d.setDate(d.getDate()-i);
+    S._streakShow.push({label:days[d.getDay()===0?6:d.getDay()-1],date:d.toDateString()});
+  }
+  renderStreak();
+}
+function renderStreak(){
+  const row=document.getElementById('streakRow');
+  row.innerHTML='';
+  (S._streakShow||[]).forEach(d=>{
+    const done=(S.streakDays||[]).includes(d.date);
+    const el=document.createElement('div');
+    el.className='streak-day'+(done?' done':'');
+    el.innerHTML=`<span>${done?'🔥':'○'}</span><span>${d.label}</span>`;
+    row.appendChild(el);
+  });
+}
+
+// ============================================================
+// DAILY BONUS
+// ============================================================
+function claimDaily(){
+  const today=new Date().toDateString();
+  if(S.lastDaily===today){showToast('Уже получил! Приходи завтра 😊');return;}
+  // streak
+  const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yesterdayStr=yesterday.toDateString();
+  if(S.lastDaily===yesterdayStr){S.streak=(S.streak||0)+1;}
+  else{S.streak=1;}
+  if(!S.streakDays)S.streakDays=[];
+  S.streakDays.push(today);
+  if(S.streakDays.length>30)S.streakDays=S.streakDays.slice(-30);
+  S.lastDaily=today;
+  const bonus=25+Math.min(S.streak*5,50);
+  addCoins(bonus, window.innerWidth/2, 150);
+  addXP(20);
+  updateTaskProg('streak',S.streak);
+  showModal('🎁','Ежедневный бонус!',`+${bonus} 🥥 получено!\nСерия: ${S.streak} дней 🔥`);
+  const card=document.getElementById('dailyCard');
+  card.classList.add('claimed');
+  document.getElementById('dailyReward').textContent='✓ Получено';
+  save(); renderAll();
+}
+
+function renderDaily(){
+  const today=new Date().toDateString();
+  const card=document.getElementById('dailyCard');
+  const reward=document.getElementById('dailyReward');
+  if(S.lastDaily===today){
+    card.classList.add('claimed');
+    reward.textContent='✓ Получено';
+  } else {
+    card.classList.remove('claimed');
+    const bonus=25+Math.min((S.streak||0)*5,50);
+    reward.textContent=`+${bonus}🥥`;
+  }
+}
+
+// ============================================================
+// RENDER ALL
+// ============================================================
+function renderAll(){
+  renderTopBar();
+  renderXP();
+  renderSceneItems();
+  renderSceneIncome();
+  renderTasks();
+  renderShop();
+  renderLeaderboard();
+  renderProfile();
+  renderQuick();
+  renderStreak();
+  renderDaily();
+  updateTaskProg('coins', S.coins);
+}
+
+function renderTopBar(){
+  document.getElementById('coinsVal').textContent=S.coins;
+  document.getElementById('levelPill').textContent='Ур.'+S.level;
+  document.getElementById('topBarName').textContent='🏖️ '+(S.barName||'Мой бар');
+}
+
+function renderXP(){
+  const needed=S.level*100;
+  const pct=Math.min(100,Math.round((S.xp/needed)*100));
+  document.getElementById('xpFill').style.width=pct+'%';
+  document.getElementById('xpVal').textContent=`${S.xp}/${needed} XP`;
+  document.getElementById('xpLabel').textContent='Ур.'+S.level;
+}
+
+function renderSceneItems(){
+  const c=document.getElementById('sceneItems');
+  c.innerHTML='';
+  const owned=ITEMS.filter(i=>S.ownedItems.includes(i.id));
+  const positions=[8,18,30,43,56,67,78,87,92];
+  if(owned.length===0){
+    ['⛱️','🌴','🪑'].forEach((em,i)=>{
+      const el=document.createElement('div');el.className='scene-item';
+      el.style.cssText=`left:${[12,45,72][i]}%;opacity:0.35;animation-delay:${i*0.4}s`;
+      el.textContent=em;c.appendChild(el);
+    });
+    return;
+  }
+  owned.slice(0,9).forEach((item,i)=>{
+    const el=document.createElement('div');el.className='scene-item';
+    el.style.cssText=`left:${positions[i]||5+i*10}%;animation-delay:${i*0.3}s`;
+    el.textContent=item.emoji;
+    el.onclick=e=>{e.stopPropagation();tapScene(e,1);};
+    c.appendChild(el);
+  });
+}
+
+function renderSceneIncome(){
+  const base=1;
+  const bonus=Math.floor(S.ownedItems.length/3);
+  document.getElementById('sceneIncome').textContent=`💰 +${base+bonus}/тап`;
+}
+
+// ============================================================
+// TASKS
+// ============================================================
+let currentTaskCat='Все';
+function renderTasks(){
+  // filter buttons
+  const filterEl=document.getElementById('tasksFilter');
+  filterEl.innerHTML='';
+  TASK_CATS.forEach(cat=>{
+    const b=document.createElement('button');b.className='filter-btn'+(cat===currentTaskCat?' active':'');
+    b.textContent=cat;b.onclick=()=>{currentTaskCat=cat;renderTasks();};
+    filterEl.appendChild(b);
+  });
+
+  const list=document.getElementById('tasksList');
+  list.innerHTML='';
+  const filtered=currentTaskCat==='Все'?TASKS:TASKS.filter(t=>t.cat===currentTaskCat);
+  filtered.forEach(task=>{
+    const prog=S.taskProgress[task.id]||0;
+    const done=S.taskClaimed[task.id];
+    const ready=prog>=task.target&&!done;
+    const pct=Math.min(100,Math.round((prog/task.target)*100));
+    const card=document.createElement('div');
+    card.className='task-card'+(done?' done':ready?' ready':'');
+    card.innerHTML=`
+      <div class="task-ico">${task.icon}</div>
+      <div class="task-body">
+        <div class="task-name">${task.name}</div>
+        <div class="task-desc">${task.desc}</div>
+        <div class="task-prog-wrap"><div class="task-prog-fill" style="width:${pct}%"></div></div>
+        <div class="task-prog-label">${prog}/${task.target}</div>
+      </div>
+      <div class="task-reward">🥥${task.reward}</div>
+      ${done?'<div class="task-check">✅</div>':''}
+    `;
+    if(ready) card.onclick=()=>claimTask(task);
+    list.appendChild(card);
+  });
+}
+
+function claimTask(task){
+  if(S.taskClaimed[task.id]) return;
+  S.taskClaimed[task.id]=true;
+  addCoins(task.reward, window.innerWidth/2, 200);
+  addXP(25);
+  showToast(`✅ ${task.name}! +${task.reward} 🥥`);
+  checkNewTaskBadge();
+  save(); renderAll();
+}
+
+function checkNewTaskBadge(){
+  const hasReady=TASKS.some(t=>{
+    const prog=S.taskProgress[t.id]||0;
+    return prog>=t.target&&!S.taskClaimed[t.id];
+  });
+  const tab=document.getElementById('tabTasks');
+  if(hasReady){
+    if(!tab.querySelector('.tab-dot')){
+      const dot=document.createElement('div');dot.className='tab-dot';
+      tab.appendChild(dot);
+    }
+  } else {
+    const dot=tab.querySelector('.tab-dot');
+    if(dot)dot.remove();
+  }
+}
+
+// ============================================================
+// SHOP
+// ============================================================
+let currentShopCat='Все';
+function renderShop(){
+  const catsEl=document.getElementById('shopCats');
+  catsEl.innerHTML='';
+  SHOP_CATS.forEach(cat=>{
+    const b=document.createElement('button');b.className='cat-btn'+(cat===currentShopCat?' active':'');
+    b.textContent=cat;b.onclick=()=>{currentShopCat=cat;renderShop();};
+    catsEl.appendChild(b);
+  });
+
+  const grid=document.getElementById('shopGrid');
+  grid.innerHTML='';
+  const filtered=currentShopCat==='Все'?ITEMS:ITEMS.filter(i=>i.cat===currentShopCat);
+  filtered.forEach(item=>{
+    const owned=S.ownedItems.includes(item.id);
+    const can=!owned&&S.coins>=item.price;
+    const locked=item.minLevel&&S.level<item.minLevel;
+    const card=document.createElement('div');
+    card.className='shop-card'+(owned?' owned':can?' affordable':'')+(item.rare?' rare-item':'');
+    card.innerHTML=`
+      ${item.rare?'<div class="rare-tag">✨ RARE</div>':''}
+      ${owned?'<div class="shop-owned-mark">✓</div>':''}
+      <span class="shop-emoji">${item.emoji}</span>
+      <div class="shop-name">${item.name}</div>
+      ${owned?'<div class="shop-price-tag" style="color:var(--green)">Куплено</div>'
+        :`<div class="shop-price-tag">🥥 ${item.price}</div>`}
+      ${locked&&!owned?`<div class="shop-level-lock"><span>🔒</span><span>Ур. ${item.minLevel}</span></div>`:''}
+    `;
+    if(!owned&&!locked) card.onclick=()=>buyItem(item);
+    else if(locked&&!owned) card.onclick=()=>showToast(`🔒 Нужен ${item.minLevel} уровень!`);
+    grid.appendChild(card);
+  });
+}
+
+function buyItem(item){
+  if(S.coins<item.price){showToast('❌ Мало кокосов!');return;}
+  if(S.ownedItems.includes(item.id)){return;}
+  S.coins-=item.price; S.ownedItems.push(item.id); S.totalBuys++;
+  addXP(18);
+  const rares=ITEMS.filter(i=>i.rare&&S.ownedItems.includes(i.id)).length;
+  updateTaskProg('buy',S.ownedItems.length);
+  updateTaskProg('rare',rares);
+  updateTaskProg('buy_nature',ITEMS.filter(i=>i.cat==='Природа'&&S.ownedItems.includes(i.id)).length);
+  showToast(`${item.emoji} ${item.name} появился на пляже!`);
+  save(); renderAll();
+}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+function renderLeaderboard(){
+  const list=document.getElementById('lbList');
+  list.innerHTML='';
+  const myEntry={name:S.barName||'Мой бар',avatar:'⭐',coins:S.coins,uid:'me'};
+  const board=[...LEADERBOARD_MOCK, myEntry].sort((a,b)=>b.coins-a.coins);
+  board.slice(0,10).forEach((entry,i)=>{
+    const rankCls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const rankLabel=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    const isMe=entry.uid==='me';
+    const card=document.createElement('div');
+    card.className='lb-card'+(isMe?' me':'');
+    card.innerHTML=`
+      <div class="lb-rank ${rankCls}">${rankLabel}</div>
+      <div class="lb-avatar">${entry.avatar}</div>
+      <div class="lb-info">
+        <div class="lb-name">${entry.name}${isMe?' <span style="font-size:10px;color:var(--coco)">(ты)</span>':''}</div>
+        <div class="lb-bar">${isMe?'Твой бар':''}</div>
+      </div>
+      <div class="lb-score">🥥 ${entry.coins}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function updateTournamentTimer(){
+  const now=new Date();
+  const sunday=new Date(now);
+  sunday.setDate(now.getDate()+(7-now.getDay())%7||7);
+  sunday.setHours(23,59,59,0);
+  const diff=sunday-now;
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  document.getElementById('tbTimer').textContent=`${d}д ${h}ч`;
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+function renderProfile(){
+  // stats
+  const stats=[
+    {val:S.coins,label:'Кокосов'},
+    {val:S.level,label:'Уровень'},
+    {val:S.ownedItems.length,label:'Предметов'},
+    {val:S.streak||0,label:'Серия дней'},
+  ];
+  const ps=document.getElementById('profStats');
+  ps.innerHTML='';
+  stats.forEach(s=>{
+    const el=document.createElement('div');el.className='pstat';
+    el.innerHTML=`<span class="pstat-val">${s.val}</span><span class="pstat-label">${s.label}</span>`;
+    ps.appendChild(el);
+  });
+
+  // achievements
+  const ag=document.getElementById('achGrid');
+  ag.innerHTML='';
+  ACHIEVEMENTS.forEach(ach=>{
+    const unlocked=ach.cond(S);
+    const el=document.createElement('div');
+    el.className='ach-item'+(unlocked?' unlocked':' locked');
+    el.innerHTML=`<span class="ach-ico">${ach.emoji}</span><span class="ach-name">${ach.name}</span>`;
+    el.onclick=()=>showToast(unlocked?`✅ ${ach.name} — разблокировано!`:`🔒 ${ach.name} — выполни условие`);
+    ag.appendChild(el);
+  });
+
+  // events
+  const evList=document.getElementById('eventsList');
+  evList.innerHTML='';
+  EVENTS.forEach(ev=>{
+    const prog=S.eventProgress[ev.id]||0;
+    const done=prog>=ev.target;
+    const pct=Math.min(100,Math.round((prog/ev.target)*100));
+    const card=document.createElement('div');card.className='event-card';
+    card.innerHTML=`
+      <div class="event-header">
+        <div class="event-icon">${ev.icon}</div>
+        <div class="event-title">${ev.name}</div>
+      </div>
+      <div class="event-desc">${ev.desc}</div>
+      <div class="event-progress"><div class="event-fill" style="width:${pct}%"></div></div>
+      <div class="event-footer">
+        <div class="event-reward">${done?'✅ Выполнено!':'🎁 Награда: +'+ev.reward+' 🥥 '+ev.rewardEmoji}</div>
+        <div class="event-timer">${prog}/${ev.target}</div>
+      </div>
+    `;
+    if(done&&!S.taskClaimed['ev_'+ev.id]){
+      card.onclick=()=>{
+        S.taskClaimed['ev_'+ev.id]=true;
+        addCoins(ev.reward, window.innerWidth/2, 300);
+        showModal(ev.rewardEmoji,'Событие выполнено!',`+${ev.reward} 🥥 за "${ev.name}"!`);
+        save();renderAll();
+      };
+    }
+    evList.appendChild(card);
+  });
+}
+
+// ============================================================
+// QUICK ORDERS
+// ============================================================
+let qCools={};
+function renderQuick(){
+  const row=document.getElementById('quickRow');
+  row.innerHTML='';
+  QUICK_ORDERS.forEach(q=>{
+    const now=Date.now();
+    const remaining=qCools[q.id]?Math.max(0,q.cool-(now-qCools[q.id])):0;
+    const cooling=remaining>0;
+    const btn=document.createElement('div');
+    btn.className='quick-btn'+(cooling?' cooling':'');
+    btn.id='qb_'+q.id;
+    btn.innerHTML=`
+      <span>${q.emoji}</span>
+      <span class="q-name">${q.name}</span>
+      <span class="q-coin">+${q.coins}🥥</span>
+      ${cooling?`<div class="quick-cooldown">${Math.ceil(remaining/1000)}с</div>`:''}
+    `;
+    if(!cooling) btn.onclick=()=>doQuickOrder(q);
+    row.appendChild(btn);
+  });
+}
+
+function doQuickOrder(q){
+  qCools[q.id]=Date.now();
+  addCoins(q.coins, window.innerWidth/2, 400);
+  addXP(4);
+  S.totalOrders++;
+  updateTaskProg('order',S.totalOrders);
+  updateEventProg('cocktail_hour');
+  save();renderTopBar();renderQuick();
+  // refresh cooldowns
+  setTimeout(()=>renderQuick(), q.cool+100);
+  const interval=setInterval(()=>{
+    const el=document.getElementById('qb_'+q.id);
+    if(!el){clearInterval(interval);return;}
+    const rem=Math.max(0,q.cool-(Date.now()-qCools[q.id]));
+    if(rem<=0){clearInterval(interval);renderQuick();return;}
+    const cd=el.querySelector('.quick-cooldown');
+    if(cd)cd.textContent=Math.ceil(rem/1000)+'с';
+  },500);
+}
+
+// ============================================================
+// CAFE ORDERS (in profile for now — can be tab)
+// ============================================================
+let cafeCools={};
+// (Not rendered separately now, quick orders cover this)
+
+// ============================================================
+// TAP
+// ============================================================
+function tapScene(event){
+  const bonus=Math.floor(S.ownedItems.length/3);
+  const reward=1+bonus;
+  addCoins(reward, event.clientX||window.innerWidth/2, event.clientY||200);
+  addXP(2);
+  S.totalTaps++;
+  updateTaskProg('tap',S.totalTaps);
+  updateEventProg('sunset_party');
+  checkNewTaskBadge();
+  save();renderTopBar();renderSceneIncome();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function addCoins(amount,x,y){
+  S.coins+=amount;
+  const el=document.createElement('div');el.className='fcoin';
+  el.textContent='+'+amount+' 🥥';
+  el.style.left=(x-35)+'px';el.style.top=(y-25)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1350);
+  updateTaskProg('coins',S.coins);
+}
+
+function addXP(amount){
+  S.xp+=amount;
+  const needed=S.level*100;
+  if(S.xp>=needed){
+    S.xp-=needed;S.level++;
+    updateTaskProg('level',S.level);
+    showModal('🎉','Новый уровень!',`🏆 Уровень ${S.level}!\nТебе открываются новые предметы!`);
+  }
+  renderXP();renderTopBar();
+}
+
+function updateTaskProg(type,value){
+  TASKS.filter(t=>t.type===type).forEach(t=>{
+    if(!S.taskClaimed[t.id]){
+      if(type==='level') S.taskProgress[t.id]=value;
+      else S.taskProgress[t.id]=Math.max(S.taskProgress[t.id]||0, value);
+    }
+  });
+  if(type==='name') S.taskProgress['name_bar']=1;
+}
+
+function updateEventProg(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev)return;
+  if(S.taskClaimed['ev_'+id])return;
+  if(!S.eventProgress)S.eventProgress={};
+  const cur=S.eventProgress[id]||0;
+  if(cur<ev.target){
+    S.eventProgress[id]=cur+1;
+    if(S.eventProgress[id]>=ev.target){
+      showToast('🎉 Событие выполнено! Забери награду в Профиле');
+    }
+  }
+}
+
+function updateBarName(val){
+  S.barName=val;
+  document.getElementById('topBarName').textContent='🏖️ '+(val||'Мой бар');
+  if(val.length>=2) updateTaskProg('name',1);
+  checkNewTaskBadge();
+  save();
+}
+
+// ============================================================
+// PASSIVE INCOME
+// ============================================================
+function startPassive(){
+  setInterval(()=>{
+    const passive=Math.floor(S.ownedItems.length/2);
+    if(passive>0){
+      S.coins+=passive;addXP(1);
+      save();renderTopBar();
+      updateTaskProg('coins',S.coins);
+    }
+  },30000);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sec'+name).classList.add('active');
+  if(name==='Leader')renderLeaderboard();
+  if(name==='Profile')renderProfile();
+}
+
+// ============================================================
+// MODAL / TOAST
+// ============================================================
+function showModal(emoji,title,body,btnTxt){
+  document.getElementById('modEmoji').textContent=emoji;
+  document.getElementById('modTitle').textContent=title;
+  document.getElementById('modBody').textContent=body;
+  document.getElementById('modBtn').textContent=btnTxt||'🎉 Круто!';
+  document.getElementById('modalBg').style.display='flex';
+}
+function closeMod(e){if(e.target===document.getElementById('modalBg'))closeModAll();}
+function closeModAll(){document.getElementById('modalBg').style.display='none';}
+
+function showToast(msg){
+  const el=document.createElement('div');el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2900);
+}
+
+// ============================================================
+// FIRST TIME
+// ============================================================
+const isNew=!localStorage.getItem('hawa2');
+
+// ============================================================
+// START LOADER
+// ============================================================
+runLoader();
+</script>
+</body>
+</html>
